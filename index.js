@@ -4,7 +4,7 @@ let bodyPaser = require("body-parser");
 require('dotenv').config();
 
 const nodemailer = require('nodemailer');
-const log = console.log;
+// const log = console.log;
 
 let app = express();
 app.use(bodyPaser.json());
@@ -19,13 +19,14 @@ app.get("/", (req, res, next) => {
     
 })
 app.post("/sendmail", async (req, res, next) => {
-    if (req.body.jsom == "girlscriptsuratHai") {
+    if (req.body.mama == "girlscriptsuratHai") {
         try {
             let x = await sendMail(req.body, "GirlScriptWebsite");
             let y = await sendMail({
                 name: "Girlscript Surat",
                 email: req.body.email,
-                message: "We Successfully recieve your email and we will contact you soon"
+                message: "We Successfully recieve your email and we will contact you soon",
+                forUser : true
             }, "GirlScriptWebsite");
             res.statusCode = 200;
             res.setHeader("content-type", "application/json");
@@ -55,6 +56,7 @@ app.post("/sendmail", async (req, res, next) => {
 
 
 function sendMail(body, sub) {
+    console.log(body);
     let status = true;
     // Step 1
     let transporter = nodemailer.createTransport({
@@ -69,7 +71,7 @@ function sendMail(body, sub) {
     // Step 2
     let mailOptions = {
         from: process.env.EMAIl, // TODO: email sender
-        to: body.email, // TODO: email receiver
+        to: body.hasOwnProperty('forUser') ?  body.email : process.env.EMAIL, // TODO: email receiver
         subject: sub,
         html: `<h1>${body.name}</h1><br><h3>${body.email}</h3><br><p>${body.message}</p>`
     };
